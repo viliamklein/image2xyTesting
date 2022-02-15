@@ -1,7 +1,7 @@
 # This file is part of the Astrometry.net suite.
 # Licensed under a 3-clause BSD style license - see LICENSE
 
-BASEDIR := /home/viliam/sources/astrometry.net-0.85/
+BASEDIR := /home/viliam/sources/astrometry.net-0.85
 COMMON := $(BASEDIR)/util
 
 CATALOGS := $(BASEDIR)/catalogs
@@ -48,8 +48,12 @@ CFLAGS += $(CATS_INC)
 CFLAGS += $(ANFILES_CFLAGS)
 CFLAGS += $(ANFILES_INC)
 CFLAGS += -I$(ANUTILS_DIR)
-CFLAGS += -I.
+CFLAGS += -I$(LIBDIR)
 CFLAGS += $(CFITS_INC)
+
+SRC := src
+BIN := build
+CXXFLAGS := -ffinite-math-only -fno-signaling-nans -pthread -march=native
 
 SHAREDLIBFLAGS := $(SHAREDLIBFLAGS_DEF)
 
@@ -62,28 +66,51 @@ PROGS := $(MAIN_PROGS)
 ANLIBS := $(ANFILES_LIB) $(LIBKD_LIB) $(ANUTILS_LIB) $(GSL_LIB) $(QFITS_LIB)
 
 
-INSTALL_EXECS := $(PROGS)
+# INSTALL_EXECS := $(PROGS)
 
-INSTALL_H := allquads.h augment-xylist.h axyfile.h \
-	engine.h onefield.h solverutils.h build-index.h catalog.h \
-	codefile.h codetree.h fits-guess-scale.h hpquads.h \
-	image2xy-files.h merge-index.h \
-	new-wcs.h quad-builder.h quad-utils.h resort-xylist.h \
-	solvedfile.h solver.h tweak.h uniformize-catalog.h \
-	unpermute-quads.h unpermute-stars.h verify.h \
-	tweak2.h
+# INSTALL_H := allquads.h augment-xylist.h axyfile.h \
+# 	engine.h onefield.h solverutils.h build-index.h catalog.h \
+# 	codefile.h codetree.h fits-guess-scale.h hpquads.h \
+# 	image2xy-files.h merge-index.h \
+# 	new-wcs.h quad-builder.h quad-utils.h resort-xylist.h \
+# 	solvedfile.h solver.h tweak.h uniformize-catalog.h \
+# 	unpermute-quads.h unpermute-stars.h verify.h \
+# 	tweak2.h
 
-ALL_EXECS :=
+# ALL_EXECS :=
 
-all: $(QFITS_SLIB) $(LIBKD_LIB_FILE) \
-	$(ANUTILS_LIB_FILE) $(ANFILES_LIB_FILE) \
-	$(PROGS) 
+# $(info ************  TEST VERSION ************)
+# $(info $$var is [${PROGS}])
 
-$(MAIN_PROGS): %: %-main.o $(SLIB)
+# all: $(QFITS_SLIB) $(LIBKD_LIB_FILE) \
+# 	$(ANUTILS_LIB_FILE) $(ANFILES_LIB_FILE) \
+# 	$(PROGS) 
 
-image2xy: image2xy-main.o image2xy-files.o $(CFITS_SLIB) 
-	$(CC) -o $@ $(LDFLAGS) $^ $(CFITS_LIB) $(LDLIBS)
+EXECUTABLE := image2xy
 
+all: $(BIN)/$(EXECUTABLE)
+
+run: clean all
+	clear
+	./$(BIN)/$(EXECUTABLE)
+
+# $(MAIN_PROGS): %: $(SRC)/%-main.o $(SLIB)
+
+# $(info ************  TEST VERSION ************)
+# $(info $$var is [${LDFLAGS}])
+
+# .ONESHELL:
+
+# sayhi:
+#     @echo Hi
+#     exit
+#     @echo Bye
+
+# image2xy: image2xy-main.o image2xy-files.o $(CC) -o $@  $(LDFLAGS) $^ $(CFITS_LIB) $(LDLIBS)
+$(BIN)/$(EXECUTABLE): $(SRC)/*.cpp 
+	$(CC) $(CXXFLAGS) $(LDFLAGS) $(CFLAGS) $^ -o $@ \
+	-L$(LIBDIR) -L$(BASEDIR)/util -L$(BASEDIR)/qfits-an \
+	 -lanutils -lanbase -lanfiles -lqfits -lgsl -lgslcblas $(CFITS_LIB) $(LDLIBS) 
 
 .PHONY: clean
 
@@ -91,7 +118,7 @@ clean:
 	rm -f $(EXECS) $(EXTRA_EXECS) $(SOLVER_EXECS) $(MISC_EXECS) $(PROGS) \
 		$(PIPELINE) $(PROSPECTUS) $(DEPS) $(FITS_UTILS) $(ALL_OBJ) \
 		$(NODEP_OBJS) fitsverify \
-		$(ALL_EXECS) $(GENERATED_FILES) $(ALL_TESTS_CLEAN) \
+		$(ALL_EXECS) $(GENERATED_FILES) $(ALL_TESTS_CLEAN) $(BIN)/* \
 		 *.o *~ *.dep deps
 
 
