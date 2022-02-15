@@ -85,6 +85,11 @@ dkms.conf
 
 # Local History for Visual Studio Code
 .history/
+build/*
+*.fits
+# *.common
+# *.cfitsio
+# *.anfiles
 
 # Built Visual Studio Code Extensions
 *.vsix
