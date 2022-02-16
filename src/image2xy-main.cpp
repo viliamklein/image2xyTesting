@@ -71,7 +71,7 @@ int main(int argc, char *argv[]) {
     char* infn;
     int overwrite = 0;
     int loglvl = LOG_MSG;
-    anbool do_u8 = TRUE;
+    anbool do_u8 = true;
     int downsample = 0;
     int downsample_as_reqd = 0;
     int extension = 0;
@@ -100,10 +100,10 @@ int main(int argc, char *argv[]) {
             params->sigma = atof(optarg);
             break;
         case 'b':
-            params->nobgsub = TRUE;
+            params->nobgsub = true;
             break;
         case 'G':
-            params->nobgsub = TRUE;
+            params->nobgsub = true;
             params->globalbg = atof(optarg);
             break;
         case 'P':
@@ -143,7 +143,7 @@ int main(int argc, char *argv[]) {
             downsample = atoi(optarg);
             break;
         case '8':
-            do_u8 = FALSE;
+            do_u8 = false;
             break;
         case 'v':
             loglvl++;
