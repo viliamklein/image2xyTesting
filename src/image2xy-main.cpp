@@ -2,6 +2,8 @@
  # This file is part of the Astrometry.net suite.
  # Licensed under a 3-clause BSD style license - see LICENSE
  */
+#include <iostream>
+#include <iomanip>
 
 #include <string.h>
 #include <stdio.h>
@@ -13,9 +15,11 @@
 extern "C" {
 #include "os-features.h"
 #include "image2xy-files.h"
+#include "image2xy.h"
 #include "log.h"
 #include "errors.h"
 #include "ioutils.h"
+#include "cfitsutils.h"
 }
 
 static const char* OPTIONS = "hi:Oo:8Hd:D:ve:B:S:M:s:p:P:bU:g:C:m:a:G:w:L:";
@@ -168,31 +172,63 @@ int main(int argc, char *argv[]) {
 
     infn = argv[optind];
 
-    log_init((log_level) loglvl);
-    logverb("infile=%s\n", infn);
+    // log_init((log_level) loglvl);
+    // logverb("infile=%s\n", infn);
 
-    if (!outfn) {
-        // Create xylist filename (by trimming '.fits')
-        asprintf_safe(&outfn, "%.*s.xy.fits", (int)(strlen(infn)-5), infn);
-        logverb("outfile=%s\n", outfn);
+    // if (!outfn) {
+    //     // Create xylist filename (by trimming '.fits')
+    //     asprintf_safe(&outfn, "%.*s.xy.fits", (int)(strlen(infn)-5), infn);
+    //     logverb("outfile=%s\n", outfn);
+    // }
+
+    // if (overwrite && file_exists(outfn)) {
+    //     logverb("Deleting existing output file \"%s\"...\n", outfn);
+    //     if (unlink(outfn)) {
+    //         SYSERROR("Failed to delete existing output file \"%s\"", outfn);
+    //         exit(-1);
+    //     }
+    // }
+
+    // if (downsample)
+    //     logverb("Downsampling by %i\n", downsample);
+    int status = 0;
+    int nhdus, hdutype, nimgs;
+    int naxis;
+    long naxisn[3];
+    int bitpix;
+
+    fitsfile *fptr = NULL;
+    fits_open_file(&fptr, infn, READONLY, &status);
+    fits_get_num_hdus(fptr, &nhdus, &status);
+    fits_get_img_dim(fptr, &naxis, &status);
+    fits_get_img_size(fptr, 2, naxisn, &status);
+    fits_get_img_type(fptr, &bitpix, &status);
+
+    long fpixel[2] = {1, 1};
+    simplexy_fill_in_defaults(params);
+    params->image = (float *) malloc(naxisn[0] * naxisn[1] * sizeof(float));
+    fits_read_pix(fptr, TFLOAT, fpixel, naxisn[0]*naxisn[1], NULL,
+                          params->image, NULL, &status);
+
+    params->nx = naxisn[0];
+    params->ny = naxisn[1];
+
+    if ( image2xy_run(params, downsample, 0) ){
+        std::cout << "error" << std::endl;
     }
-
-    if (overwrite && file_exists(outfn)) {
-        logverb("Deleting existing output file \"%s\"...\n", outfn);
-        if (unlink(outfn)) {
-            SYSERROR("Failed to delete existing output file \"%s\"", outfn);
-            exit(-1);
+    else{
+        std::cout << std::setprecision(4);
+        std::cout << std::fixed;
+        for (int ii=0; ii<params->npeaks; ii++){
+            std::cout << params->x[ii] << "," << params->y[ii] << "," << params->flux[ii] << "," << params->background[ii] << "\n";
         }
     }
 
-    if (downsample)
-        logverb("Downsampling by %i\n", downsample);
-
-    if (image2xy_files(infn, outfn, do_u8, downsample, downsample_as_reqd,
-                       extension, plane, params)) {
-        ERROR("image2xy failed.");
-        exit(-1);
-    }
-    free(outfn);
+    // if (image2xy_files(infn, outfn, do_u8, downsample, downsample_as_reqd,
+    //                    extension, plane, params)) {
+    //     ERROR("image2xy failed.");
+    //     exit(-1);
+    // }
+    // free(outfn);
     return 0;
 }

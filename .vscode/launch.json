@@ -9,7 +9,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/build/image2xy",
-            "args": ["-O", "-H", "-w 5", "onGround25ms_20220214_034701.001.fits"],
+            "args": ["-O", "-H", "-w 5", "onGround25ms_20220214_034600.425.fits"],
             "stopAtEntry": true,
             "cwd": "${workspaceFolder}",
             "environment": [],
