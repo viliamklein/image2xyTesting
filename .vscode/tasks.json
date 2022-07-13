@@ -5,14 +5,100 @@
     "tasks": [
 		{
 			"type": "shell",
-			"label": "make",
-			"command": "make",
-			"args": [],
-			"problemMatcher": "$gcc",
+			"label": "Build test libTS.so",
+			"command": "/usr/bin/g++",
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"problemMatcher": ["$gcc"],
 			"group": {
 				"kind": "build",
 				"isDefault": true
-			}
+			},
+			"args": [
+				"-Llib/",
+				"-Iinclude/",
+				"-I/home/viliam/sources/astrometry.net-0.89/util",
+				"-I/home/viliam/sources/astrometry.net-0.89/include",
+				"-I/home/viliam/sources/astrometry.net-0.89/include/astrometry",
+				"-std=c++2a",
+				"-Wall",
+				"-o",
+				"${workspaceFolder}/build/testLib",
+				"${workspaceFolder}/src/test.cpp",
+				"-lTS",
+				"-lcfitsio"
+			]
 		},
+		{
+			"type": "shell",
+			"label": "compile libTS.so",
+			"command": "/usr/bin/g++",
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"problemMatcher": ["$gcc"],
+			"group": {
+				"kind": "none",
+				"isDefault": false
+			},
+			"args": [
+				"-ffinite-math-only",
+				"-fno-signaling-nans",
+				"-pthread",
+				"-march=native",
+				"-fPIC",
+				"-c",
+				"-o",
+				"${workspaceFolder}/lib/libts.o",
+				"${workspaceFolder}/src/TSimage2xy.cpp",
+				"-Iinclude/",
+				"-I/home/viliam/sources/astrometry.net-0.89/util",
+				"-I/home/viliam/sources/astrometry.net-0.89/include",
+				"-I/home/viliam/sources/astrometry.net-0.89/include/astrometry"
+			]
+		},
+		{	
+			"type": "shell",
+			"label": "Build libTS.so",
+			"command": "/usr/bin/g++",
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"problemMatcher": ["$gcc"],
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"dependsOn":[
+				"compile libTS.so"
+			],
+			"args": [
+				"-shared",
+				"-std=c++2a",
+				"-L/home/viliam/sources/astrometry.net-0.89/solver",
+				"-L/home/viliam/sources/astrometry.net-0.89/util",
+				"-L/home/viliam/sources/astrometry.net-0.89/include",
+				"-L/home/viliam/sources/astrometry.net-0.89/include/astrometry",
+				"-L/home/viliam/sources/astrometry.net-0.89/qfits-an",
+				"-L/home/viliam/sources/astrometry.net-0.89/catalogs",
+				"-o",
+				"${workspaceFolder}/lib/libTS.so",
+				"${workspaceFolder}/lib/libts.o",
+				"-lcfitsio",
+				"-lcatalogs",
+				"-lanfiles",
+				"-lanutils",
+				"-lanbase",
+				"-lqfits",
+				"-pthread",
+				"-lm",
+				"-lrt",
+				"-ldl",
+				"-lgsl",
+				"-lgslcblas",
+				"-lcurl"
+			]
+		}
     ]
 }
