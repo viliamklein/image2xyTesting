@@ -16,6 +16,8 @@
 				"isDefault": true
 			},
 			"args": [
+				"-std=c++2a",
+				"-g",
 				"-Llib/",
 				"-Iinclude/",
 				"-I/home/viliam/sources/astrometry.net-0.89/util",

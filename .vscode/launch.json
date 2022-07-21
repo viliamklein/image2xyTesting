@@ -8,11 +8,16 @@
             "name": "gdb debug",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/image2xy",
-            "args": ["-O", "-H", "-w 5", "onGround25ms_20220214_034600.425.fits"],
+            "program": "${workspaceFolder}/build/testLib",
+            "args": ["/mnt/c/Users/vilia/Documents/SwRI/ThaiSpice/pcoFitsTest/jul08/pcoWideSourceTest_01_20220709_050600.109.fits"],
             "stopAtEntry": true,
             "cwd": "${workspaceFolder}",
-            "environment": [],
+            "environment": [
+                {
+                    "name": "LD_LIBRARY_PATH",
+                    "value": "/home/viliam/thaiSpice/image2xyTesting/lib:"
+                }
+            ],
             "externalConsole": false,
             "MIMode": "gdb",
             "setupCommands": [
@@ -22,7 +27,7 @@
                     "ignoreFailures": true
                 }
             ],
-            "preLaunchTask": "make",
+            "preLaunchTask": "Build test libTS.so",
         },
         // {
         //     "name": "(gdb) Launch",

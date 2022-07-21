@@ -13,6 +13,11 @@ simplexy_t tsImage2xy(std::vector<float> image, int ww, int hh){
     simplexy_fill_in_defaults(params);
     params->image = (float *) malloc(ww * hh * sizeof(float));
 
+    params->dpsf = 3;
+    params->maxsize = 512;
+    params->dlim = 30;
+    params->plim = 5;
+
     params->image = &image[0];
     params->nx = ww;
     params->ny = hh;
