@@ -76,29 +76,53 @@ void testIndex(std::vector<float> imgData){
     
     std::vector<float> halfCol = getHalfCol(imgData, colOffset, indNumRows, width);
 
-    double avg = getAverage(halfCol);
-    std::cout << avg << "\n";
+    
+    // std::cout << avg << "\n";
 }
 
 template<typename TT>
 std::vector<TT> getHalfCol(std::vector<TT> const& dataVec, int offset, int numRows, int width){
 
-    std::vector<TT> halfCol(numRows, 0);
-    // std::vector<TT>::iterator it;
-    // auto itData = dataVec.begin();
-    int indArray = 0;
-    int ii = 0;
+    std::vector<TT> halfColTop(numRows, 0);
+    std::vector<TT> halfColBottom(numRows, 0);
+    std::vector<TT> avgRemoved = dataVec;
 
-    for(auto itData = dataVec.begin(); itData != dataVec.end(); std::advance(itData, width), ii++){
-        halfCol[ii] = *itData;
+    std::vector<double> avgT(numRows, 0);
+    std::vector<double> avgB(numRows, 0);
+
+    int ii;
+
+    for(int offset = 0; offset < numRows; offset++){
+
+        for(auto itData = dataVec.begin(), ii = 0; itData < dataVec.begin() + numRows*width; std::advance(itData, width), ii++){
+            halfColTop[ii] = *(itData + offset);
+            halfColBottom[ii] = *(itData + dataVec.size()/2 + offset);
+        }
+
+        std::vector<TT> halfColTopNoHeader(&halfColTop[10], &halfColTop[numRows-1]);
+        avgT[offset] = getAverage(halfColTopNoHeader);
+        avgB[offset] = getAverage(halfColBottom);
+
+        for(auto itData = avgRemoved.begin(), ii = 0; itData < avgRemoved.begin() + numRows*width; std::advance(itData, width), ii++){
+            // avgRemoved[ii] = *(itData + offset);
+            // avgRemoved[ii] = *(itData + dataVec.size()/2 + offset);
+
+            *(itData + offset) -= avgT[offset];
+            *(itData + dataVec.size()/2 + offset) -= avgB[offset];
+        }
+
     }
 
-    // for(int ii = 0; ii < numRows; ii++){
-    //     indArray = ii * width + offset;
-    //     halfCol[ii] = dataVec[indArray];
-    // }
+    // std::vector<TT> halfColTopNoHeader(&halfColTop[10], &halfColTop[ii]);
+    // avgT = getAverage(halfColTopNoHeader);
+    // avgB = getAverage(halfColBottom);
 
-    return halfCol;
+    // for(auto itData = dataVec.begin(); itData < dataVec.begin() + (width/2)*width; std::advance(itData, width), ii++){
+    //     halfCol[ii] = *itData;
+    // }
+    // double avg = getAverage(halfCol);
+
+    return avgRemoved;
 }
 
 template<typename T>
