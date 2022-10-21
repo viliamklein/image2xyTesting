@@ -8,6 +8,7 @@
 
 std::vector<float> char2floatConv(std::vector<int16_t> inData);
 void testIndex(std::vector<float> imgData);
+void saveFits(std::vector<float> const& dataVec, std::string fname);
 
 template<typename T> double getAverage(std::vector<T> const& v);
 template<typename TT> std::vector<TT> getHalfCol(std::vector<TT> const& dataVec, int offset, int numRows, int width);
@@ -76,8 +77,32 @@ void testIndex(std::vector<float> imgData){
     
     std::vector<float> halfCol = getHalfCol(imgData, colOffset, indNumRows, width);
 
-    
+    saveFits(halfCol, "test.fits");
     // std::cout << avg << "\n";
+}
+
+void saveFits(std::vector<float> const& dataVec, std::string fname){
+
+    // std::string fitsFileName = argv[1];
+    int status=0, imgType;
+    long naxes[2], fpixel[2];
+    fitsfile *pcoFits;
+    // void * imgPtr = (float *) &dataVec[0];
+
+    naxes[0] = 1024;
+    naxes[1] = 1024;
+    fpixel[0] = 1;
+    fpixel[1] = 1;
+
+    fits_create_file(&pcoFits, fname.c_str(), &status);
+
+    fits_create_img(pcoFits, FLOAT_IMG, 2, &naxes[0], &status);
+
+    // fits_write_pix(pcoFits, TFLOAT, &fpixel, 1024*1024, (float *) &dataVec[0], &status);
+    fits_write_pix(pcoFits, TFLOAT, &fpixel[0], dataVec.size(), (float *) &dataVec[0], &status);
+
+    fits_close_file(pcoFits, &status);
+
 }
 
 template<typename TT>
