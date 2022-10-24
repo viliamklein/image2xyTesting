@@ -112,12 +112,12 @@ std::vector<TT> getHalfCol(std::vector<TT> const& dataVec, int offset, int numRo
     std::vector<TT> halfColBottom(numRows, 0);
     std::vector<TT> avgRemoved = dataVec;
 
-    std::vector<double> avgT(numRows, 0);
-    std::vector<double> avgB(numRows, 0);
+    std::vector<double> avgT(width, 0);
+    std::vector<double> avgB(width, 0);
 
     int ii;
 
-    for(int offset = 0; offset < numRows; offset++){
+    for(int offset = 0; offset < width; offset++){
 
         for(auto itData = dataVec.begin(), ii = 0; itData < dataVec.begin() + numRows*width; std::advance(itData, width), ii++){
             halfColTop[ii] = *(itData + offset);
