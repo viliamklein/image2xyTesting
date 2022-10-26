@@ -11,7 +11,7 @@ void testIndex(std::vector<float> imgData);
 void saveFits(std::vector<float> const& dataVec, std::string fname);
 
 template<typename T> double getAverage(std::vector<T> const& v);
-template<typename TT> std::vector<TT> getHalfCol(std::vector<TT> const& dataVec, int offset, int numRows, int width);
+template<typename TT> std::vector<TT> removeColMean(std::vector<TT> const& dataVec, int offset, int numRows, int width);
 
 int main(int argc, char *argv[]){
 
@@ -41,7 +41,7 @@ int main(int argc, char *argv[]){
 
     simplexy_t test;
     std::vector<float> tI(testImage.begin(), testImage.end());
-    testIndex(tI);
+    tI = removeColMean(tI, 0, naxes[0]/2, naxes[0]);
     test = tsImage2xy(tI, naxes[0], naxes[1]);
 
     // std::cout << "done with test\n";
@@ -75,9 +75,9 @@ void testIndex(std::vector<float> imgData){
     std::vector<int> inddata(width, 0);
     std::iota(inddata.begin(), inddata.end(), 0);
     
-    std::vector<float> halfCol = getHalfCol(imgData, colOffset, indNumRows, width);
+    std::vector<float> halfCol = removeColMean(imgData, colOffset, indNumRows, width);
 
-    saveFits(halfCol, "test.fits");
+    // saveFits(halfCol, "test.fits");
     // std::cout << avg << "\n";
 }
 
@@ -106,7 +106,7 @@ void saveFits(std::vector<float> const& dataVec, std::string fname){
 }
 
 template<typename TT>
-std::vector<TT> getHalfCol(std::vector<TT> const& dataVec, int offset, int numRows, int width){
+std::vector<TT> removeColMean(std::vector<TT> const& dataVec, int offset, int numRows, int width){
 
     std::vector<TT> halfColTop(numRows, 0);
     std::vector<TT> halfColBottom(numRows, 0);
