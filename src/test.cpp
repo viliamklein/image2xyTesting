@@ -11,6 +11,7 @@ void testIndex(std::vector<float> imgData);
 void saveFits(std::vector<float> const& dataVec, std::string fname);
 
 template<typename T> double getAverage(std::vector<T> const& v);
+template<typename TTT> double getMedian(std::vector<TTT>& v);
 template<typename TT> std::vector<TT> removeColMean(std::vector<TT> const& dataVec, int offset, int numRows, int width);
 
 int main(int argc, char *argv[]){
@@ -125,8 +126,8 @@ std::vector<TT> removeColMean(std::vector<TT> const& dataVec, int offset, int nu
         }
 
         std::vector<TT> halfColTopNoHeader(&halfColTop[10], &halfColTop[numRows-1]);
-        avgT[offset] = getAverage(halfColTopNoHeader);
-        avgB[offset] = getAverage(halfColBottom);
+        avgT[offset] = (double) getMedian(halfColTopNoHeader);
+        avgB[offset] = (double) getMedian(halfColBottom);
 
         for(auto itData = avgRemoved.begin(), ii = 0; itData < avgRemoved.begin() + numRows*width; std::advance(itData, width), ii++){
             // avgRemoved[ii] = *(itData + offset);
@@ -148,6 +149,18 @@ std::vector<TT> removeColMean(std::vector<TT> const& dataVec, int offset, int nu
     // double avg = getAverage(halfCol);
 
     return avgRemoved;
+}
+
+
+template<typename T>
+double getMedian(std::vector<T>& v) {
+    if (v.empty()) {
+        return 0;
+    }
+ 
+    auto m = v.begin() + v.size() / 2;
+    std::nth_element(v.begin(), m, v.end());
+    return v[v.size() / 2];
 }
 
 template<typename T>
